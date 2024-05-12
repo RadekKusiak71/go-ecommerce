@@ -5,6 +5,7 @@ import (
 	"log"
 	"net/http"
 
+	"github.com/RadekKusiak71/goEcom/services/accounts"
 	"github.com/gorilla/mux"
 )
 
@@ -22,6 +23,11 @@ func NewAPIServer(listenAddr string, db *sql.DB) *APIServer {
 
 func (s *APIServer) Run() error {
 	router := mux.NewRouter()
+
+	accountStore := accounts.NewStore(s.db)
+	accountsHandler := accounts.NewHandler(accountStore)
+	accountsHandler.RegisterRoutes(router)
+
 	log.Printf("Server is running on localhost%s \n", s.addr)
 	return http.ListenAndServe(s.addr, router)
 }

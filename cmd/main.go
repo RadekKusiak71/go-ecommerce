@@ -12,8 +12,8 @@ func main() {
 	if err != nil {
 		log.Fatal(err)
 	}
-	server := api.NewAPIServer(":8080", storage)
 
+	server := api.NewAPIServer(":8080", storage)
 	err = server.Run()
 	if err != nil {
 		log.Fatal(err)

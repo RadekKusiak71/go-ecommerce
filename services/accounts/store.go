@@ -61,11 +61,11 @@ func (s *Store) GetAccountByEmail(email string) (*types.Account, error) {
 }
 
 func (s *Store) CreateAccount(account types.Account) (string, error) {
-	_, err := s.db.Exec(`INSERT INTO accounts (first_name,last_name,email,password)
+	_, err := s.db.Exec(`INSERT INTO accounts (first_name,last_name,email,password_hash)
 						VALUES ($1,$2,$3,$4)`, account.FirstName, account.LastName, account.Email, account.Password)
 	if err != nil {
 		log.Println(err)
-		return "", fmt.Errorf("error while creating account")
+		return "", fmt.Errorf("account with this email already exists")
 	}
 	return "account created", nil
 }

@@ -19,9 +19,9 @@ func NewStorage() (*sql.DB, error) {
 
 func getConnectionString() string {
 	godotenv.Load()
-	psUSER := os.Getenv("PS_USER")
-	psPSW := os.Getenv("PS_PSW")
-	psNAME := os.Getenv("PS_NAME")
+	psUSER := os.Getenv("POSTGRES_USER")
+	psPSW := os.Getenv("POSTGRES_PASSWORD")
+	psNAME := os.Getenv("POSTGRES_DB")
 	psPORT := os.Getenv("PS_PORT")
 
 	return fmt.Sprintf("user=%s password=%s dbname=%s port=%s sslmode=disable", psUSER, psPSW, psNAME, psPORT)
