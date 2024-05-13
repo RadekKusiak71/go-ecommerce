@@ -138,7 +138,7 @@ func (h *Handler) handleUpdateAccount(w http.ResponseWriter, r *http.Request) {
 	}, accountID)
 
 	if err != nil {
-		utils.WriteError(w, http.StatusInternalServerError, fmt.Errorf("accounts were not found"))
+		utils.WriteError(w, http.StatusInternalServerError, fmt.Errorf("account were not found"))
 		return
 	}
 
