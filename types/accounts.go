@@ -11,6 +11,12 @@ type Account struct {
 	CreatedAt time.Time `json:"created_at"`
 }
 
+type AccountUpdate struct {
+	FirstName string `json:"first_name"`
+	LastName  string `json:"last_name"`
+	Email     string `json:"email"`
+}
+
 type AccountPayload struct {
 	FirstName string `json:"first_name"`
 	LastName  string `json:"last_name"`
@@ -29,7 +35,9 @@ type LoginResponse struct {
 }
 type AccountStore interface {
 	GetAccounts() ([]*Account, error)
-	GetAccountByID(accountID int) (*Account, error)
-	GetAccountByEmail(email string) (*Account, error)
-	CreateAccount(account Account) (string, error)
+	GetAccountByID(int) (*Account, error)
+	GetAccountByEmail(string) (*Account, error)
+	CreateAccount(Account) (string, error)
+	UpdateAccount(Account, int) (*Account, error)
+	DeleteAccount(int) (string, error)
 }

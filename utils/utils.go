@@ -2,7 +2,11 @@ package utils
 
 import (
 	"encoding/json"
+	"fmt"
 	"net/http"
+	"strconv"
+
+	"github.com/gorilla/mux"
 )
 
 func WriteJSON(w http.ResponseWriter, status int, v any) error {
@@ -28,4 +32,17 @@ func ParseJSON(r *http.Request, v any) error {
 		return err
 	}
 	return nil
+}
+
+func ReadRequestID(r *http.Request) (int, error) {
+	id, ok := mux.Vars(r)["id"]
+	if !ok {
+		return 0, fmt.Errorf("missing account id")
+	}
+
+	accountID, err := strconv.Atoi(id)
+	if err != nil {
+		return 0, fmt.Errorf("internal server error")
+	}
+	return accountID, nil
 }

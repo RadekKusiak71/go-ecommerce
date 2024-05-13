@@ -21,9 +21,14 @@ func NewHandler(db types.AccountStore) *Handler {
 	}
 }
 
-func (h Handler) RegisterRoutes(r *mux.Router) {
-	r.HandleFunc("/register", h.handleCreateAccount)
-	r.HandleFunc("/login", h.handleLoginAccount)
+func (h *Handler) RegisterRoutes(r *mux.Router) {
+	r.HandleFunc("/register", h.handleCreateAccount).Methods("POST")
+	r.HandleFunc("/login", h.handleLoginAccount).Methods("POST")
+
+	r.HandleFunc("/accounts", h.handleGetAccounts).Methods("GET")
+	r.HandleFunc("/accounts/{id}", h.handleRetrieveAccount).Methods("GET")
+	r.HandleFunc("/accounts/{id}", h.handleUpdateAccount).Methods("PUT")
+	r.HandleFunc("/accounts/{id}", h.handleDeleteAccount).Methods("DELETE")
 }
 
 func (h *Handler) handleCreateAccount(w http.ResponseWriter, r *http.Request) {
@@ -88,4 +93,68 @@ func (h *Handler) handleLoginAccount(w http.ResponseWriter, r *http.Request) {
 	}
 
 	utils.WriteJSON(w, http.StatusOK, loginResponse)
+}
+
+func (h *Handler) handleGetAccounts(w http.ResponseWriter, r *http.Request) {
+	accounts, err := h.db.GetAccounts()
+	if err != nil {
+		utils.WriteError(w, http.StatusInternalServerError, fmt.Errorf("accounts were not found"))
+		return
+	}
+	utils.WriteJSON(w, http.StatusOK, accounts)
+}
+func (h *Handler) handleRetrieveAccount(w http.ResponseWriter, r *http.Request) {
+
+	accountID, err := utils.ReadRequestID(r)
+	if err != nil {
+		utils.WriteError(w, http.StatusBadRequest, err)
+		return
+	}
+
+	account, err := h.db.GetAccountByID(accountID)
+	if err != nil {
+		utils.WriteError(w, http.StatusInternalServerError, fmt.Errorf("account was not found"))
+		return
+	}
+
+	utils.WriteJSON(w, http.StatusOK, account)
+}
+func (h *Handler) handleUpdateAccount(w http.ResponseWriter, r *http.Request) {
+	accountID, err := utils.ReadRequestID(r)
+	if err != nil {
+		utils.WriteError(w, http.StatusBadRequest, err)
+		return
+	}
+	accountPayload := new(types.AccountUpdate)
+	if err := utils.ParseJSON(r, accountPayload); err != nil {
+		utils.WriteError(w, http.StatusBadGateway, fmt.Errorf("invalid payload"))
+		return
+	}
+
+	account, err := h.db.UpdateAccount(types.Account{
+		FirstName: accountPayload.FirstName,
+		LastName:  accountPayload.LastName,
+		Email:     accountPayload.Email,
+	}, accountID)
+
+	if err != nil {
+		utils.WriteError(w, http.StatusInternalServerError, fmt.Errorf("accounts were not found"))
+		return
+	}
+
+	utils.WriteJSON(w, http.StatusOK, account)
+}
+func (h *Handler) handleDeleteAccount(w http.ResponseWriter, r *http.Request) {
+	accountID, err := utils.ReadRequestID(r)
+	if err != nil {
+		utils.WriteError(w, http.StatusBadRequest, err)
+		return
+	}
+
+	if res, err := h.db.DeleteAccount(accountID); err != nil {
+		utils.WriteError(w, http.StatusBadRequest, err)
+		return
+	} else {
+		utils.WriteINFO(w, http.StatusOK, "message", res)
+	}
 }
