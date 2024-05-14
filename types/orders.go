@@ -30,3 +30,15 @@ type OrderItemPayload struct {
 	Quantity   int     `json:"quantity"`
 	TotalPrice float64 `json:"total_price"`
 }
+
+type OrderDetails struct {
+	Order    *Order
+	Products []*CartItem
+}
+
+type OrderStore interface {
+	GetOrders() ([]*Order, error)
+	GetOrderByID(int) (*Order, error)
+	GetUserOrders(int) ([]*Order, error)
+	GetFullOrderDetails(int) (*OrderDetails, error)
+}

@@ -6,6 +6,7 @@ import (
 	"net/http"
 
 	"github.com/RadekKusiak71/goEcom/services/accounts"
+	"github.com/RadekKusiak71/goEcom/services/orders"
 	"github.com/RadekKusiak71/goEcom/services/products"
 	"github.com/gorilla/mux"
 )
@@ -32,6 +33,10 @@ func (s *APIServer) Run() error {
 	productStore := products.NewStore(s.db)
 	productsHandler := products.NewHandler(productStore)
 	productsHandler.RegisterRoutes(router)
+
+	ordersStore := orders.NewStore(s.db)
+	ordersHandler := orders.NewHandler(ordersStore)
+	ordersHandler.RegisterRoutes(router)
 
 	log.Printf("Server is running on localhost%s \n", s.addr)
 	return http.ListenAndServe(s.addr, router)
